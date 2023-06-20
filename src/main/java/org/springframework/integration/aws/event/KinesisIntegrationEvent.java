@@ -26,6 +26,8 @@ package org.springframework.integration.aws.event;
 @SuppressWarnings("serial")
 public abstract class KinesisIntegrationEvent extends AwsIntegrationEvent {
 
+	private static final long serialVersionUID = 1;
+
 	public KinesisIntegrationEvent(Object source) {
 		super(source);
 	}
