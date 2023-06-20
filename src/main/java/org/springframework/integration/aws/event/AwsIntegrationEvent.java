@@ -28,6 +28,8 @@ import org.springframework.integration.events.IntegrationEvent;
 @SuppressWarnings("serial")
 public abstract class AwsIntegrationEvent extends IntegrationEvent {
 
+	private static final long serialVersionUID = 1;
+
 	public AwsIntegrationEvent(Object source) {
 		super(source);
 	}
