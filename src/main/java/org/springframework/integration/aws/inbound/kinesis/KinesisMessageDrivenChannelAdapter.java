@@ -1628,7 +1628,7 @@ public class KinesisMessageDrivenChannelAdapter extends MessageProducerSupport
 
 	}
 
-	private final static class LockCompletableFuture extends CompletableFuture<Boolean> {
+	private static final class LockCompletableFuture extends CompletableFuture<Boolean> {
 
 		private final String lockKey;
 
