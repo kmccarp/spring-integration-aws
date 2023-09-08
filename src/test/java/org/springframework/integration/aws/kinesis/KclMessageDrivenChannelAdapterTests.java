@@ -53,37 +53,37 @@ public class KclMessageDrivenChannelAdapterTests implements LocalstackContainerT
 
 	private static final String TEST_STREAM = "TestStreamKcl";
 
-	private static KinesisAsyncClient AMAZON_KINESIS;
+	private static KinesisAsyncClient amazonKinesis;
 
-	private static DynamoDbAsyncClient DYNAMO_DB;
+	private static DynamoDbAsyncClient dynamoDb;
 
-	private static CloudWatchAsyncClient CLOUD_WATCH;
+	private static CloudWatchAsyncClient cloudWatch;
 
 	@Autowired
 	private PollableChannel kinesisReceiveChannel;
 
 	@BeforeAll
 	static void setup() {
-		AMAZON_KINESIS = LocalstackContainerTest.kinesisClient();
-		DYNAMO_DB = LocalstackContainerTest.dynamoDbClient();
-		CLOUD_WATCH = LocalstackContainerTest.cloudWatchClient();
+		amazonKinesis = LocalstackContainerTest.kinesisClient();
+		dynamoDb = LocalstackContainerTest.dynamoDbClient();
+		cloudWatch = LocalstackContainerTest.cloudWatchClient();
 
-		AMAZON_KINESIS.createStream(request -> request.streamName(TEST_STREAM).shardCount(1))
+		amazonKinesis.createStream(request -> request.streamName(TEST_STREAM).shardCount(1))
 				.thenCompose(result ->
-						AMAZON_KINESIS.waiter().waitUntilStreamExists(request -> request.streamName(TEST_STREAM)))
+						amazonKinesis.waiter().waitUntilStreamExists(request -> request.streamName(TEST_STREAM)))
 				.join();
 	}
 
 	@AfterAll
 	static void tearDown() {
-		AMAZON_KINESIS.deleteStream(request -> request.streamName(TEST_STREAM));
+		amazonKinesis.deleteStream(request -> request.streamName(TEST_STREAM));
 	}
 
 	@Test
 	void kclChannelAdapterReceivesRecords() {
 		String testData = "test data";
 
-		AMAZON_KINESIS.putRecord(request ->
+		amazonKinesis.putRecord(request ->
 						request.streamName(TEST_STREAM)
 								.data(SdkBytes.fromUtf8String(testData))
 								.partitionKey("test"));
@@ -103,7 +103,7 @@ public class KclMessageDrivenChannelAdapterTests implements LocalstackContainerT
 		@Bean
 		public KclMessageDrivenChannelAdapter kclMessageDrivenChannelAdapter() {
 			KclMessageDrivenChannelAdapter adapter =
-					new KclMessageDrivenChannelAdapter(AMAZON_KINESIS, CLOUD_WATCH, DYNAMO_DB, TEST_STREAM);
+					new KclMessageDrivenChannelAdapter(amazonKinesis, cloudWatch, dynamoDb, TEST_STREAM);
 			adapter.setOutputChannel(kinesisReceiveChannel());
 			adapter.setStreamInitialSequence(
 					InitialPositionInStreamExtended.newInitialPosition(InitialPositionInStream.TRIM_HORIZON));
